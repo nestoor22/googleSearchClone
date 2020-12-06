@@ -8,6 +8,12 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  indexingResultsBlock: {
+    display: 'flex',
+    marginTop: '10%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default useStyles;
