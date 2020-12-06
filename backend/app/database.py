@@ -8,7 +8,10 @@ class MongoDBConnection:
 
     def __init__(self):
         self.client = AsyncIOMotorClient(self.MONGO_DETAILS)
-        self.database = self.client.events
+        self.database = self.client["webPages"]
 
     def get_collection(self, collection_name: str):
         return self.database.get_collection(collection_name)
+
+
+database_connection = MongoDBConnection()
