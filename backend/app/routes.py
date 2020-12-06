@@ -3,6 +3,7 @@ from typing import List
 
 from .models import IndexingResultModel, SearchResultsModel
 from .services.indexing_service import WebPageIndexing
+from .services.search_service import SearchService
 
 
 router = APIRouter()
@@ -15,5 +16,7 @@ async def index_page(q: str, max_recursion: int = 3):
 
 
 @router.get("/search", response_model=List[SearchResultsModel])
-async def search_pages(search: str):
-    return {"search": search}
+async def search_pages(q: str):
+    pages_info = await SearchService(q).get_search_results()
+
+    return pages_info

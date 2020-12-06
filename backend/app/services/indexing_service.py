@@ -1,5 +1,5 @@
-from typing import Set
 import asyncio
+from typing import Set
 
 import requests
 from bs4 import BeautifulSoup
