@@ -9,7 +9,7 @@ import {
   SubmitButton,
 } from 'components';
 
-import runIndexing from '../../api/runIndexing';
+import runIndexing from 'api/runIndexing';
 
 import useStyles from './styles';
 
