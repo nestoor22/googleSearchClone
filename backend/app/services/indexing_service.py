@@ -26,7 +26,7 @@ class WebPageIndexing:
 
     async def _index_page(self, url, recursion_level: int):
         beautiful_soup_obj = await self._load_page_content(url)
-        print(url, recursion_level)
+
         indexing_result = await self._get_indexing_info(
             url, beautiful_soup_obj)
 
