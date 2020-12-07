@@ -10,8 +10,9 @@ fastapi = "~=0.61.1"
 uvicorn = "~=0.11.8"
 motor = "~=2.3.0"
 pydantic = "~=1.7.3"
-beautifulsoup4 = "*"
-requests = "*"
+beautifulsoup4 = "~=4.9.3"
+requests = "~=2.25.0"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.8.2"

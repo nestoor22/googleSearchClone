@@ -1,10 +1,12 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from .config import DATABASE_HOST, DATABASE_PORT
+from .config import \
+    DATABASE_HOST, DATABASE_PORT, DATABASE_USER, DATABASE_PASSWORD
 
 
 class MongoDBConnection:
-    MONGO_DETAILS = f"mongodb://{DATABASE_HOST}:{DATABASE_PORT}"
+    MONGO_DETAILS = f"mongodb://{DATABASE_USER}:{DATABASE_PASSWORD}" \
+                    f"@{DATABASE_HOST}:{DATABASE_PORT}"
 
     def __init__(self):
         self.client = AsyncIOMotorClient(self.MONGO_DETAILS)
