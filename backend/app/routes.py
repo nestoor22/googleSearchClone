@@ -11,6 +11,9 @@ router = APIRouter()
 
 @router.get("/index", response_model=IndexingResultModel)
 async def index_page(q: str, max_recursion: int = 3):
+    if q.endswith('/'):
+        q = q[:-1]
+
     indexing_result = await WebPageIndexing(q, max_recursion).index_web_site()
 
     return indexing_result
