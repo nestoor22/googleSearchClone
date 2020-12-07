@@ -84,9 +84,9 @@ const SearchPage = () => {
           <Loader type="Rings" color="#00BFFF" height={120} width={120} />
         )}
         {foundedResults.length !== 0 &&
-          foundedResults?.map((el) => {
+          foundedResults?.map((el, index) => {
             return (
-              <div className={classes.foundedItem}>
+              <div key={index} className={classes.foundedItem}>
                 <Typography className={classes.title}>{el.title}</Typography>
                 <a href={el.web_page_url}>{el.web_page_url}</a>
               </div>

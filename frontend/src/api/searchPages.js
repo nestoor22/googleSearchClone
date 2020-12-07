@@ -11,7 +11,6 @@ const searchResults = (setSearchResult, setLoading, offset, limit) => {
       return data.json();
     })
     .then((result) => {
-      console.log(result);
       setSearchResult(result);
       setLoading(false);
     })

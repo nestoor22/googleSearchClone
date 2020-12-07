@@ -1,7 +1,7 @@
 import asyncio
 from typing import Set
 
-import requests
+from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 
 from app.database import database_connection
@@ -13,7 +13,6 @@ class WebPageIndexing:
         self.web_site_url = url
         self.max_recursion_level = max_recursion_level
         self._indexed_links = set()
-        self._beautiful_soup_obj: BeautifulSoup
         self._pages_collection = database_connection.get_collection('webPages')
 
     async def index_web_site(self):
@@ -26,12 +25,15 @@ class WebPageIndexing:
         return {"status_code": 200, "message": "Success"}
 
     async def _index_page(self, url, recursion_level: int):
-        indexing_result = self._get_indexing_info(url)
+        beautiful_soup_obj = await self._load_page_content(url)
+        print(url, recursion_level)
+        indexing_result = await self._get_indexing_info(
+            url, beautiful_soup_obj)
 
         if not indexing_result:
-            return
+            return False
 
-        internal_links = self._get_internal_links()
+        internal_links = await self._get_internal_links(beautiful_soup_obj)
         indexing_result["internal_links"] = len(internal_links)
 
         await self._save_indexing_results(indexing_result)
@@ -43,36 +45,40 @@ class WebPageIndexing:
                 return_exceptions=True
             )
 
-        return {"status_code": 200, "message": "Indexed"}
+        return True
 
-    def _load_page_content(self, url) -> BeautifulSoup or None:
-        try:
-            response = requests.get(url)
-        except requests.RequestException:
-            return None
+    @staticmethod
+    async def _load_page_content(url: str) -> BeautifulSoup or None:
+        async with ClientSession() as session:
+            async with session.get(url) as response:
+                html = await response.text()
+                if response.status == 200:
+                    beautiful_soup_obj = BeautifulSoup(
+                        html, features="html.parser")
 
-        if response.status_code == 200:
-            self._beautiful_soup_obj = BeautifulSoup(
-                response.content.decode("utf-8"), features="html.parser")
-
-            return self._beautiful_soup_obj
+                    return beautiful_soup_obj
 
         return None
 
-    def _get_indexing_info(self, url):
-        if not self._load_page_content(url):
-            return None
+    async def _get_indexing_info(
+            self, url: str, beautiful_soup_obj: BeautifulSoup
+    ) -> dict:
+        if not beautiful_soup_obj:
+            return {}
 
         return {
-            "text": self._get_tags_content(),
-            "title": self._get_title(),
+            "text": await self._get_tags_content(beautiful_soup_obj),
+            "title": await self._get_title(beautiful_soup_obj),
             "web_site_url": self.web_site_url,
             "page_url": url
         }
 
-    def _get_internal_links(self) -> Set[str]:
+    async def _get_internal_links(
+            self, beautiful_soup_obj: BeautifulSoup
+    ) -> Set[str]:
+
         internal_links = set()
-        links = self._beautiful_soup_obj.find_all("a", href=True)
+        links = beautiful_soup_obj.find_all("a", href=True)
 
         for link in links:
             href = link["href"]
@@ -96,11 +102,13 @@ class WebPageIndexing:
 
         return internal_links
 
-    def _get_tags_content(self) -> str:
-        return self._beautiful_soup_obj.text.replace("\n", "").strip()
+    @staticmethod
+    async def _get_tags_content(beautiful_soup_obj: BeautifulSoup) -> str:
+        return beautiful_soup_obj.text.replace("\n", "").strip()
 
-    def _get_title(self) -> str:
-        title = self._beautiful_soup_obj.find("title")
+    @staticmethod
+    async def _get_title(beautiful_soup_obj: BeautifulSoup) -> str:
+        title = beautiful_soup_obj.find("title")
 
         if title:
             return title.text.strip()
