@@ -41,6 +41,10 @@ const SearchPage = () => {
     }
   };
 
+  const handleRedirect = (url) => {
+    window.location = url
+  };
+
   const handleLoadMore = () => {
     const newOffset = offset + 10;
     const newLimit = limit + 10;
@@ -87,7 +91,13 @@ const SearchPage = () => {
           foundedResults?.map((el, index) => {
             return (
               <div key={index} className={classes.foundedItem}>
-                <Typography className={classes.title}>{el.title}</Typography>
+                <Typography onClick={() => {
+                  handleRedirect(el.web_page_url)
+                  }}
+                  className={classes.title}
+                >
+                  {el.title}
+                </Typography>
                 <a href={el.web_page_url}>{el.web_page_url}</a>
               </div>
             );
